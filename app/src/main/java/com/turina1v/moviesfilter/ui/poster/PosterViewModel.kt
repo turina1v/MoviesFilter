@@ -23,17 +23,24 @@ class PosterViewModel : ViewModel() {
 
     init {
         viewModelScope.launch {
-            _loaderLiveData.value = true
-            val response = MovieApiProvider.api.getMovies()
-            if (response.isSuccessful){
-                if (response.body() != null) {
-                    _moviesLiveData.value = response.body()
+            try {
+                _loaderLiveData.value = true
+                val response = MovieApiProvider.api.getMovies()
+                if (response.isSuccessful) {
+                    if (response.body() != null) {
+                        _moviesLiveData.value = response.body()
+                    } else {
+                        _errorLiveData.value = "No movies found"
+                    }
                 } else {
-                    _errorLiveData.value = "No movies found"
+                    _errorLiveData.value = "Error, code = ${response.code()}"
                 }
-            } else {
-                _errorLiveData.value = "Error, code = " + response.code()
+            } catch (e: Throwable) {
+                _errorLiveData.value = "Error: ${e.message}"
+            } finally {
+                _loaderLiveData.value = false
             }
+
         }
     }
 }

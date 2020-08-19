@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">MoviesFilter</string>
     <string name="poster_content_description">Poster</string>
+    <string name="title_filter_2020">Показать только за 2020 год.</string>
 </resources>

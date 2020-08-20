@@ -14,7 +14,7 @@ class PosterActivity : AppCompatActivity() {
     lateinit var viewModel: PosterViewModel
 
     companion object{
-        val YEAR_FILTER = 2020
+        const val YEAR_FILTER = 2020
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

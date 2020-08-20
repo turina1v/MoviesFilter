@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.turina1v.moviesfilter.data.entity.Movie
 import com.turina1v.moviesfilter.data.network.MovieApiProvider
+import com.turina1v.moviesfilter.domain.FilterMoviesUseCase
 import kotlinx.coroutines.launch
 
 class PosterViewModel : ViewModel() {
@@ -21,6 +22,8 @@ class PosterViewModel : ViewModel() {
     val errorLiveData: LiveData<String>
         get() = _errorLiveData
 
+    private lateinit var initialMoviesList: List<Movie>
+
     init {
         viewModelScope.launch {
             try {
@@ -29,6 +32,7 @@ class PosterViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     if (response.body() != null) {
                         _moviesLiveData.value = response.body()
+                        initialMoviesList = response.body()!!
                     } else {
                         _errorLiveData.value = "No movies found"
                     }
@@ -40,7 +44,11 @@ class PosterViewModel : ViewModel() {
             } finally {
                 _loaderLiveData.value = false
             }
-
         }
+    }
+
+    fun onYearSwitchCheckedChanged(isChecked: Boolean, yearFilter: Int) {
+        if (isChecked) _moviesLiveData.value = FilterMoviesUseCase(yearFilter, initialMoviesList).execute()
+        else _moviesLiveData.value = initialMoviesList
     }
 }

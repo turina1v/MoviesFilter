@@ -13,6 +13,10 @@ class PosterActivity : AppCompatActivity() {
     lateinit var adapter: PosterAdapter
     lateinit var viewModel: PosterViewModel
 
+    companion object{
+        val YEAR_FILTER = 2020
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -49,7 +53,8 @@ class PosterActivity : AppCompatActivity() {
             recyclerPosters.visibility = View.GONE
         })
 
+        switchOnly2020.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.onYearSwitchCheckedChanged(isChecked, YEAR_FILTER)
+        }
     }
-
-
 }

@@ -6,7 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.turina1v.moviesfilter.data.entity.Movie
 import com.turina1v.moviesfilter.data.network.MovieApiProvider
+import com.turina1v.moviesfilter.data.repository.MoviesRepositoryImpl
 import com.turina1v.moviesfilter.domain.FilterMoviesUseCase
+import com.turina1v.moviesfilter.domain.LoadMoviesListUseCase
 import kotlinx.coroutines.launch
 
 class PosterViewModel : ViewModel() {
@@ -26,24 +28,15 @@ class PosterViewModel : ViewModel() {
 
     init {
         viewModelScope.launch {
-            try {
-                _loaderLiveData.value = true
-                val response = MovieApiProvider.api.getMovies()
-                if (response.isSuccessful) {
-                    if (response.body() != null) {
-                        _moviesLiveData.value = response.body()
-                        initialMoviesList = response.body()!!
-                    } else {
-                        _errorLiveData.value = "No movies found"
-                    }
-                } else {
-                    _errorLiveData.value = "Error, code = ${response.code()}"
+            _loaderLiveData.value = true
+            when (val result = LoadMoviesListUseCase(MoviesRepositoryImpl()).execute()){
+                is LoadMoviesListUseCase.LoadMoviesResult.Success -> {
+                    _moviesLiveData.value = result.movies
+                    initialMoviesList = result.movies
                 }
-            } catch (e: Throwable) {
-                _errorLiveData.value = "Error: ${e.message}"
-            } finally {
-                _loaderLiveData.value = false
+                is LoadMoviesListUseCase.LoadMoviesResult.Error -> _errorLiveData.value = result.errorMessage
             }
+            _loaderLiveData.value = false
         }
     }
 
